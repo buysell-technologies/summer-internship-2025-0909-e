@@ -11,6 +11,7 @@ func (r *repository) GetUsers(ctx context.Context, tenantID string, limit, offse
 	users := []*model.User{}
 
 	if err := r.db.Unscoped().
+		Preload("Stocks"). // Preloadで一括取得（N+1問題を解決）
 		Joins("LEFT JOIN stores AS s ON users.store_id = s.id").
 		Where("s.tenant_id = ?", tenantID).
 		Limit(limit).
@@ -20,12 +21,18 @@ func (r *repository) GetUsers(ctx context.Context, tenantID string, limit, offse
 		return nil, err
 	}
 
-	for i, user := range users {
-		stocks := []*model.Stock{}
-		if err := r.db.Where("user_id = ?", user.ID).Find(&stocks).Error; err == nil {
-			users[i].Stocks = stocks
-		}
-	}
+	// 【変更前のN+1問題があったコード】
+	// for i := range users {
+	//     stocks := []*model.Stock{}
+	//     if err := r.db.Where("user_id = ?", users[i].ID).Find(&stocks).Error; err != nil {
+	//         return nil, err
+	//     }
+	//     users[i].Stocks = stocks
+	// }
+
+	// 【変更後】
+	// Preloadが自動的に各ユーザーのStocksを設定してくれるため、
+	// ループでの個別取得は不要
 
 	return users, nil
 }
@@ -34,6 +41,7 @@ func (r *repository) GetUser(ctx context.Context, tenantID, userID string) (*mod
 	user := &model.User{}
 
 	if err := r.db.Unscoped().
+		Preload("Stocks"). // Preloadで一括取得（N+1問題を解決）
 		Joins("LEFT JOIN stores AS s ON users.store_id = s.id").
 		Where("s.tenant_id = ? AND users.id = ?", tenantID, userID).
 		First(&user).
@@ -41,10 +49,16 @@ func (r *repository) GetUser(ctx context.Context, tenantID, userID string) (*mod
 		return nil, err
 	}
 
-	stocks := []*model.Stock{}
-	if err := r.db.Where("user_id = ?", user.ID).Find(&stocks).Error; err == nil {
-		user.Stocks = stocks
-	}
+	// 【変更前のN+1問題があったコード】
+	// stocks := []*model.Stock{}
+	// if err := r.db.Where("user_id = ?", user.ID).Find(&stocks).Error; err != nil {
+	//     return nil, err
+	// }
+	// user.Stocks = stocks
+
+	// 【変更後】
+	// Preloadが自動的にuser.Stocksを設定してくれるため、
+	// 個別取得は不要
 
 	return user, nil
 }
