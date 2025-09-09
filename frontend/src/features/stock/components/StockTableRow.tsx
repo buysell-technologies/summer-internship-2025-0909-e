@@ -1,4 +1,6 @@
-import { TableRow, TableCell } from '@mui/material';
+import { TableRow, TableCell, IconButton, Box } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import type { ModelStock } from '../../../api/generated/model';
 import { useI18n } from '../../../providers/I18nProvider';
 
@@ -11,14 +13,19 @@ interface StockTableRowProps {
     quantity: string;
     created: string;
     updated: string;
+    actions?: string;
   };
   isMobile: boolean;
+  onEdit: (stock: ModelStock) => void;
+  onDelete: (stock: ModelStock) => void;
 }
 
 const StockTableRow = ({
   stock,
   columnWidths,
   isMobile,
+  onEdit,
+  onDelete,
 }: StockTableRowProps) => {
   const { formatDate } = useI18n();
 
@@ -119,6 +126,29 @@ const StockTableRow = ({
         }}
       >
         {formatDate(stock.updated_at) || '-'}
+      </TableCell>
+      <TableCell
+        sx={{
+          width: columnWidths.actions,
+          py: 1.5,
+        }}
+      >
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
+          <IconButton
+            size="small"
+            onClick={() => onEdit(stock)}
+            color="primary"
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={() => onDelete(stock)}
+            color="error"
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Box>
       </TableCell>
     </TableRow>
   );

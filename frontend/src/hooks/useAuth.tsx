@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { jwtDecode } from 'jwt-decode';
 
-interface JWTPayload {
+export interface JWTPayload {
   sub: string;
   name: string;
   store_id: string;
