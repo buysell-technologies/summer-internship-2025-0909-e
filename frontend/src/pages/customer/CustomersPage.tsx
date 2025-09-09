@@ -31,14 +31,42 @@ const CustomersPage = () => {
   const [page, setPage] = useState(0);
 
   const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
-    const stored = localStorage.getItem(CUSTOMER_PAGE_SETTINGS_STORAGE_KEY)!;
-    const parsed = JSON.parse(stored) as CustomerPageSettings;
-    if (
-      typeof parsed.rowsPerPage === 'number' &&
-      VALID_PAGE_SIZES.includes(parsed.rowsPerPage as ValidPageSize)
-    ) {
-      return parsed.rowsPerPage;
+    // === 修正前のコード（エラーが発生する版） ===
+    // const stored = localStorage.getItem(CUSTOMER_PAGE_SETTINGS_STORAGE_KEY)!;
+    // const parsed = JSON.parse(stored) as CustomerPageSettings;
+    // if (
+    //   typeof parsed.rowsPerPage === 'number' &&
+    //   VALID_PAGE_SIZES.includes(parsed.rowsPerPage as ValidPageSize)
+    // ) {
+    //   return parsed.rowsPerPage;
+    // }
+    // return DEFAULT_SETTINGS.rowsPerPage;
+
+    // === 修正後のコード（nullチェックを追加） ===
+    try {
+      const stored = localStorage.getItem(CUSTOMER_PAGE_SETTINGS_STORAGE_KEY);
+
+      // nullチェック：localStorageにデータがない場合（初回アクセス時など）
+      if (!stored) {
+        return DEFAULT_SETTINGS.rowsPerPage;
+      }
+
+      const parsed = JSON.parse(stored) as CustomerPageSettings;
+
+      // 型とバリデーションチェック
+      if (
+        parsed &&
+        typeof parsed.rowsPerPage === 'number' &&
+        VALID_PAGE_SIZES.includes(parsed.rowsPerPage as ValidPageSize)
+      ) {
+        return parsed.rowsPerPage;
+      }
+    } catch (error) {
+      // JSON.parseエラーやその他の予期しないエラーをキャッチ
+      console.warn('Failed to load customer page settings:', error);
     }
+
+    // 何か問題があった場合はデフォルト値を使用
     return DEFAULT_SETTINGS.rowsPerPage;
   });
 
