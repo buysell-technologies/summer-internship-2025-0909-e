@@ -63,8 +63,6 @@ func (r *repository) UpdateStock(ctx context.Context, stock model.Stock) (*model
 			"name":     stock.Name,
 			"quantity": stock.Quantity,
 			"price":    stock.Price,
-			"store_id": stock.StoreID,
-			"user_id":  stock.UserID,
 		}).Error; err != nil {
 		return nil, err
 	}
