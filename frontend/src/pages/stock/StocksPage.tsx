@@ -1,5 +1,10 @@
 import { useMemo, useState } from 'react';
-import { useGetStocks, usePostStocks, usePutStocksId, useDeleteStocksId } from '../../api/generated/api';
+import {
+  useGetStocks,
+  usePostStocks,
+  usePutStocksId,
+  useDeleteStocksId,
+} from '../../api/generated/api';
 import StockTable from '../../features/stock/components/StockTable';
 import {
   CircularProgress,
@@ -101,7 +106,11 @@ const StocksPage = () => {
   };
 
   // 登録フォームの保存
-  const handleFormSave = async (values: { name: string; price: number; quantity: number }) => {
+  const handleFormSave = async (values: {
+    name: string;
+    price: number;
+    quantity: number;
+  }) => {
     if (!storeId || !userId) return;
 
     setFormLoading(true);
@@ -164,7 +173,6 @@ const StocksPage = () => {
       setDeleteLoading(false);
     }
   };
-
 
   if (isLoading) {
     return (
@@ -238,15 +246,24 @@ const StocksPage = () => {
       </Box>
 
       {/* 登録・編集フォームダイアログ */}
-      <Dialog open={formOpen} onClose={handleFormCancel} maxWidth="sm" fullWidth>
+      <Dialog
+        open={formOpen}
+        onClose={handleFormCancel}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>{editingStock ? '在庫編集' : '在庫登録'}</DialogTitle>
         <DialogContent>
           <StockForm
-            initialValues={editingStock ? {
-              name: editingStock.name!,
-              price: editingStock.price!,
-              quantity: editingStock.quantity!,
-            } : undefined}
+            initialValues={
+              editingStock
+                ? {
+                    name: editingStock.name!,
+                    price: editingStock.price!,
+                    quantity: editingStock.quantity!,
+                  }
+                : undefined
+            }
             onSave={handleFormSave}
             onCancel={handleFormCancel}
             loading={formLoading}
