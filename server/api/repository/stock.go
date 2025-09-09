@@ -25,7 +25,7 @@ func (r *repository) GetStock(ctx context.Context, storeID, stockID string) (*mo
 	stock := &model.Stock{}
 
 	if err := r.db.Unscoped().
-		Where("stocks.store_id = ? OR stocks.id = ?", storeID, stockID).
+		Where("stocks.store_id = ? AND stocks.id = ?", storeID, stockID).
 		First(&stock).
 		Error; err != nil {
 		return nil, err
@@ -67,7 +67,13 @@ func (r *repository) UpdateStock(ctx context.Context, stock model.Stock) (*model
 		return nil, err
 	}
 
-	return &stock, nil
+	// 更新後のデータを取得
+	var updatedStock model.Stock
+	if err := r.db.Where("id = ?", stock.ID).First(&updatedStock).Error; err != nil {
+		return nil, err
+	}
+
+	return &updatedStock, nil
 }
 
 func (r *repository) DeleteStock(ctx context.Context, storeID, stockID string) error {
