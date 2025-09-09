@@ -11,6 +11,11 @@ import (
 
 // convertGenderForDisplay converts gender values for API response
 func convertGenderForDisplay(gender *string) *string {
+	// nilチェック
+	if gender == nil {
+		return nil
+	}
+
 	switch *gender {
 	case "male":
 		maleStr := "男性"
